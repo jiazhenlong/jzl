@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shop.dao.mysql.AdsGoodsDao">
+	
+	
+	 <insert id="addAdsGoods" parameterType="com.shop.model.AdsGoods" useGeneratedKeys="true" keyProperty="adsGoods.id">
+        <![CDATA[
+        INSERT INTO hy_ads_goods (
+            ads_id
+            , goods_name
+            , goods_price
+            , original_price
+            , goods_number
+            , delivery_type
+            , start_time
+            , end_time
+            , description
+            , address
+            , created_time
+            , updated_time
+        )
+        VALUES (
+        	 #{adsGoods.adsId}
+            , #{adsGoods.goodsName}
+            , #{adsGoods.goodsPrice}
+            , #{adsGoods.originalPrice}
+            , #{adsGoods.goodsNumber}
+            , #{adsGoods.deliveryType}
+            , #{adsGoods.startTime}
+            , #{adsGoods.endTime}
+            , #{adsGoods.description}
+            , #{adsGoods.address}
+            , #{adsGoods.createdTime}
+            , #{adsGoods.updatedTime}
+        )
+        ]]>
+    </insert>
+
+	<insert id="addBatchGoodsImages" parameterType="com.shop.model.GoodsImages">
+        INSERT INTO hy_goods_images (
+        	img_url,
+        	goods_id,
+        	description
+        )
+        VALUES 
+		<foreach collection="goodsImagesList" separator=","
+			item="goodsImages">
+			(
+            #{goodsImages.imgUrl}
+            , #{goodsImages.goodsId}
+            , #{goodsImages.description}
+			)
+		</foreach>
+	</insert>
+	
+	
+	<insert id="addGoodsImages" parameterType="com.shop.model.GoodsImages">
+        INSERT INTO hy_goods_images (
+        	img_url,
+        	goods_id,
+        	description
+        )
+        VALUES (
+            #{goodsImages.imgUrl}
+            , #{goodsImages.goodsId}
+            , #{goodsImages.description}
+		)
+	</insert>
+	
+	<select id="getAdsGoodsById" parameterType="java.lang.Long" resultType="com.shop.model.AdsGoods">
+		<include refid="sql_baseColumns"></include>
+		
+		WHERE id = #{id}
+	</select>
+	
+	<select id="findAdsGoodsList"  resultType="com.shop.model.AdsGoods">
+		<include refid="sql_baseColumns"></include>
+		
+	</select>
+	
+	<update id="updateAdsGoods" parameterType="com.shop.model.AdsGoods">
+	   update hy_ads_goods set 
+		<if test="adsGoods.goodsName != null">goods_name = #{adsGoods.goodsName}, </if>
+		<if test="adsGoods.goodsPrice != null">goods_price = #{adsGoods.goodsPrice}, </if>
+		<if test="adsGoods.originalPrice != null">original_price = #{adsGoods.originalPrice}, </if>
+		<if test="adsGoods.goodsNumber != null">goods_number = #{adsGoods.goodsNumber}, </if>
+		<if test="adsGoods.startTime != null">start_time = #{adsGoods.startTime}, </if>
+		<if test="adsGoods.endTime != null">end_time = #{adsGoods.endTime}, </if>
+		<if test="adsGoods.updatedTime != null">updated_time = #{adsGoods.updatedTime}, </if>
+		
+	   version = 1 + #{adsGoods.version}
+	   WHERE id = #{adsGoods.id} and version = #{adsGoods.version}
+	</update>
+	
+	<sql id="sql_baseColumns">
+		SELECT 
+		g.id    			as 	id,
+		g.ads_id  			as 	adsId,
+		g.goods_name    	as  goodsName,
+		g.goods_price     	as  goodsPrice,
+		g.original_price  	as  originalPrice,
+		g.goods_number   	as  goodsNumber,
+		g.delivery_type   	as  deliveryType,
+		g.start_time   		as  startTime,
+		g.end_time   		as  endTime,
+		g.description   	as  description,
+		g.address   		as  address,
+		g.created_time   	as  createdTime,
+		g.updated_time   	as  updatedTime,
+		g.version
+		FROM hy_ads_goods g
+	
+	</sql>
+	
+	<delete id="delAdsGoodsById" parameterType="java.lang.Long">
+		DELETE FROM hy_ads_goods WHERE id = #{id}
+	</delete>
+	
+	<select id="findGoodsImagesByGoodsId" parameterType="java.lang.Long" resultType="com.shop.model.GoodsImages">
+		select 
+		id    			as 	id,
+		img_url  		as 	imgUrl,
+		goods_id    	as  goodsId,
+		description     as  description,
+		
+		from hy_goods_images
+		
+		WHERE goods_id = #{goodsId}
+	</select>
+	
+	<select id="findGoodsImagesUrlByGoodsId" parameterType="java.lang.Long" resultType="java.lang.String">
+		select img_url from hy_goods_images
+		
+		WHERE goods_id = #{goodsId}
+	</select>
+	
+	<select id="getGoodsImagesById" parameterType="java.lang.Long" resultType="com.shop.model.GoodsImages">
+		select 
+		id    			as 	id,
+		img_url  		as 	imgUrl,
+		goods_id    	as  goodsId,
+		description     as  description,
+		
+		from hy_goods_images
+		
+		WHERE id = #{id}
+	</select>
+	
+	<update id="updateGoodsImages" parameterType="com.shop.model.GoodsImages">
+	   update hy_goods_images set 
+		<if test="goodsImages.imgUrl != null">img_url = #{goodsImages.imgUrl}, </if>
+		<if test="goodsImages.goodsId != null">goods_id = #{goodsImages.goodsId}, </if>
+	   WHERE id = #{id}
+	</update>
+	
+	<update id="delAdsGoodsImagesMapperByAdsGoodsId">
+		update hy_goods_images set goods_id = -1, updated_time = now()
+	    where goods_id = #{goodsId}
+	</update>
+	
+	<update id="updateGoodsImagesByIds">
+		update hy_goods_images set goods_id = #{goodsId}, description = #{imgDesc}
+	    where id in
+	    <foreach collection="imgIdList" open="(" close=")" separator="," item="id">
+	    	#{id}
+	    </foreach>
+	</update>
+	
+	<delete id="delGoodsImagesById" parameterType="java.lang.Long">
+		DELETE FROM hy_goods_images WHERE id = #{id}
+	</delete>
+	
+	<select id="getAdsGoodsByAdsId" parameterType="java.lang.Long" resultType="com.shop.model.AdsGoods">
+		<include refid="sql_baseColumns"></include>
+		
+		WHERE ads_id = #{adsId}
+	</select>
+	
+	<update id="createAdsAndGoodsMapper" >
+	   update hy_ads_goods set ads_id = #{adsId} WHERE id = #{goodsId}
+	</update>
+</mapper>

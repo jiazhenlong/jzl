@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shop.dao.mysql.OrdersDao">
+	
+	
+	 <insert id="addOrders" parameterType="com.shop.model.Orders">
+        <![CDATA[
+        INSERT INTO hy_orders (
+            order_sn
+            , order_price
+            , status
+            , pay_status
+            , created_time
+            , pay_time
+            , updated_time
+            , pay_code
+            , address
+            , stime
+            , etime
+            , ads_id
+            , our_commission
+            , flow_commission
+            , shop_ads_id
+            , member_id
+            , flow_id
+            , order_source
+            , customer_message
+        )
+        VALUES (
+        	 #{orders.orderSn}
+            , #{orders.orderPrice}
+            , #{orders.status}
+            , #{orders.payStatus}
+            , #{orders.createdTime}
+            , #{orders.payTime}
+            , #{orders.updatedTime}
+            , #{orders.payCode}
+            , #{orders.address}
+            , #{orders.stime}
+            , #{orders.etime}
+            , #{orders.adsId}
+            , #{orders.ourCommission}
+            , #{orders.flowCommission}
+            , #{orders.shopAdsId}
+            , #{orders.memberId}
+            , #{orders.flowId}
+            , #{orders.orderSource}
+            , #{orders.customerMessage}
+        )
+        ]]>
+    </insert>
+
+	
+	
+	<select id="getOrdersById" parameterType="java.lang.Long" resultType="com.shop.model.Orders">
+		SELECT 
+		id    			as 	id,
+		order_sn  		as 	orderSn,
+		order_price  	as  orderPrice,
+		status     		as  status,
+		pay_status    	as  payStatus,
+		created_time    as  createdTime,
+		pay_time   		as  payTime,
+		updated_time   	as  updatedTime,
+		pay_code   		as  payCode,
+		address   		as  address,
+		stime   		as  stime,
+		etime   		as  etime,
+		ads_id   		as  adsId,
+		our_commission  as  ourCommission,
+		flow_commission as  flowCommission,
+		order_source	as	orderSource,
+		customer_message as customerMessage
+		FROM hy_orders
+		
+		WHERE id = #{id}
+	</select>
+	
+	
+	<select id="getOrdersByOrderSn" resultType="com.shop.model.Orders">
+		SELECT 
+		order_price  	as  orderPrice,
+		status     		as  status,
+		pay_status    	as  payStatus
+		FROM hy_orders
+		
+		WHERE order_sn = #{orderSn}
+	</select>
+
+	
+	<delete id="delOrdersById" parameterType="java.lang.Long">
+		DELETE FROM hy_orders WHERE id = #{id}
+	</delete>
+	
+	
+	<update id="updateOrderStatusByOrderSn">
+	  update hy_orders set status = #{status}, complete_time = now()
+	  
+	  WHERE order_sn = #{orderSn}
+	</update>
+	
+	<!-- 订单分页查询-广告主 -->
+	<select id="findOrderPage" resultType="com.shop.model.Orders">
+		SELECT
+			orders.id,
+			orders.order_sn 		as orderSn,
+			orders.status,
+			orders.pay_status 		as payStatus,
+            orders.order_price		as orderPrice,
+            orders.our_commission	as	ourCommission,
+            orders.ads_id			as	adsId,
+            orders.flow_id			as	flowId,
+            ads.shop_id				as	adsShopId,
+            orders.flow_commission	as	flowCommission
+		FROM
+			hy_orders orders
+            inner join hy_ads ads on orders.ads_id = ads.id
+			where 
+			<choose>
+				<when test="merchantsType == 1">
+					ads.shop_id = #{shopId}
+				</when>
+				
+				<otherwise>
+					orders.flow_id = #{shopId}
+				</otherwise>
+			</choose>
+			
+			<if test="status != null">AND orders.status = #{status} </if>
+			
+			limit #{pageIndex}, #{pageSize}
+	</select>
+	
+	
+	<select id="countOrderPage" resultType="java.lang.Integer">
+		SELECT
+			count(1)
+		FROM
+			hy_orders orders
+            inner join hy_ads ads on orders.ads_id = ads.id
+			where 
+			<choose>
+				<when test="merchantsType == 1">
+					ads.shop_id = #{shopId}
+				</when>
+				
+				<otherwise>
+					orders.flow_id = #{shopId}
+				</otherwise>
+			</choose>
+			<if test="status != null">AND orders.status = #{status} </if>
+	</select>
+	
+	<select id="findGoodsIdListByOrderId" parameterType="java.lang.Long" resultType="java.lang.Long">
+		SELECT
+			goods_id
+		FROM
+			hy_order_goods where id = #{ordersId}
+	</select>
+	
+	<select id="getAdsOrderDetail" resultType="com.shop.model.Orders">
+		SELECT
+			orders.id,
+			orders.order_sn 		as orderSn,
+			orders.status,
+			orders.pay_status 		as payStatus,
+            orders.order_price		as orderPrice,
+            orders.our_commission	as	ourCommission,
+            orders.ads_id			as	adsId,
+            orders.flow_id			as	flowId,
+            ads.shop_id				as	adsShopId,
+            orders.flow_commission	as	flowCommission,
+            orders.order_source		as	orderSource,
+            orders.member_id		as	memberId,
+            orders.customer_message 	as customerMessage,
+            orders.created_time    		as  createdTime,
+            orders.complete_time		as	completeTime
+		FROM
+			hy_orders orders
+            inner join hy_ads ads on orders.ads_id = ads.id
+			where orders.order_sn = #{orderSn}
+	</select>
+	
+	<select id="getFlowOrderDetail" resultType="com.shop.model.Orders">
+		SELECT
+			orders.id,
+			orders.order_sn 		as orderSn,
+			orders.status,
+			orders.pay_status 		as payStatus,
+            orders.order_price		as orderPrice,
+            orders.our_commission	as	ourCommission,
+            orders.ads_id			as	adsId,
+            orders.flow_id			as	flowId,
+            ads.shop_id				as	adsShopId,
+            orders.flow_commission	as	flowCommission,
+            orders.order_source		as	orderSource,
+            orders.member_id		as	memberId,
+            orders.customer_message 	as customerMessage,
+            orders.created_time    		as  createdTime,
+            orders.complete_time		as	completeTime,
+            sa.title				as	shopAdsName,
+            ads.commission_rate		as	adsCommissionRate
+		FROM
+			hy_orders orders
+            inner join hy_ads ads on orders.ads_id = ads.id
+            inner join hy_shop_ads sa on orders.shop_ads_id = sa.id
+			where orders.order_sn = #{orderSn}
+	</select>
+</mapper>

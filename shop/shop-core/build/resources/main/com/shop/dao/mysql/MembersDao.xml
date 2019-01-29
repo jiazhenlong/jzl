@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shop.dao.mysql.MembersDao">
+	
+	
+	 <insert id="addMembers" parameterType="com.shop.model.Members">
+        <![CDATA[
+        INSERT INTO hy_members (
+            username
+            , mobile
+            , email
+            , open_id
+            , avatarUrl
+            , gender
+            , address
+            , remark
+            , created_time
+            , updated_time
+        )
+        VALUES (
+        	 #{members.username}
+            , #{members.mobile}
+            , #{members.email}
+            , #{members.openId}
+            , #{members.avatarUrl}
+            , #{members.gender}
+            , #{members.address}
+            , #{members.remark}
+            , #{members.createdTime}
+            , #{members.updatedTime}
+        )
+        ]]>
+    </insert>
+
+	
+	
+	<select id="getMembersById" resultType="com.shop.model.Members">
+		SELECT 
+		id    			as 	id,
+		username  		as 	username,
+		mobile  		as  mobile,
+		email     		as  email,
+		open_id    		as  openId,
+		avatarUrl       as  avatarUrl,
+		gender   		as  gender,
+		address    		as  address,
+		remark			as	remark,
+		created_time    as  createdTime,
+		updated_time   	as  updatedTime
+		FROM hy_members
+		WHERE id = #{id}
+	</select>
+
+
+	
+	<delete id="delMembersById" parameterType="java.lang.Long">
+		DELETE FROM hy_members WHERE id = #{id}
+	</delete>
+</mapper>

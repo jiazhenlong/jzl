@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shop.dao.mysql.MerchantShopsDao">
+	
+	
+	 <insert id="addMerchantShops" parameterType="com.shop.model.MerchantShops" useGeneratedKeys="true" keyProperty="merchantShops.id">
+        <![CDATA[
+        INSERT INTO hy_merchant_shops (
+            name
+            , password
+            , mobile
+            , contact
+            , address
+            , verify
+            , license
+            , comment
+            , is_active
+            , created_time
+            , updated_time
+            , merchant_id
+        )
+        VALUES (
+        	 #{merchantShops.name}
+        	, #{merchantShops.password}
+            , #{merchantShops.mobile}
+            , #{merchantShops.contact}
+            , #{merchantShops.address}
+            , #{merchantShops.verify}
+            , #{merchantShops.license}
+            , #{merchantShops.comment}
+            , #{merchantShops.isActive}
+            , #{merchantShops.createdTime}
+            , #{merchantShops.updatedTime}
+            , #{merchantShops.merchantId}
+        )
+        ]]>
+    </insert>
+
+	
+	
+	<select id="getMerchantShopsById" parameterType="java.lang.Long" resultType="com.shop.model.MerchantShops">
+		SELECT 
+		id ,
+		name ,
+		password ,
+		mobile ,
+		contact ,
+		address ,
+		verify ,
+		license ,
+		comment ,
+		is_active       	as  isActive,
+		created_time   		as  createdTime,
+		updated_time       	as  updatedTime,
+		merchant_id   		as  merchantId
+		FROM hy_merchant_shops
+		
+		WHERE id = #{id}
+		
+	</select>
+	
+	<select id="getPasswordByMobile" resultType="java.lang.String">
+		SELECT password FROM hy_merchant_shops
+		
+		WHERE mobile = #{mobile}
+	</select>
+	
+	<delete id="delMerchantShopsById" parameterType="java.lang.Long">
+		DELETE FROM hy_merchant_shops WHERE id = #{id}
+	</delete>
+	
+	<update id="updateMerchantShops" parameterType="com.shop.model.MerchantShops">
+	   update hy_merchant_shops set 
+	   <trim prefix="" suffix="" suffixOverrides=",">
+		<if test="merchantShops.name != null">name = #{merchantShops.name}, </if>
+		<if test="merchantShops.contact != null">contact = #{merchantShops.contact}, </if>
+		<if test="merchantShops.verify != null">verify = #{merchantShops.verify}, </if>
+		<if test="merchantShops.address != null">address = #{merchantShops.address}, </if>
+		<if test="merchantShops.license != null">license = #{merchantShops.license}, </if>
+		<if test="merchantShops.comment != null">comment = #{merchantShops.comment}, </if>
+		<if test="merchantShops.updatedTime != null">updated_time = #{merchantShops.updatedTime}, </if>
+	   </trim>
+	   WHERE id = #{merchantShops.id}
+	</update>
+	
+	<update id="updatePassword">
+	   update hy_merchant_shops set updated_time = #{updatedTime}, password = #{password}
+	   WHERE mobile = #{mobile}
+	</update>
+</mapper>

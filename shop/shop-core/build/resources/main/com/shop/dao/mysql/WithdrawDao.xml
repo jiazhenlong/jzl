@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shop.dao.mysql.WithdrawDao">
+	
+	
+	 <insert id="addWithdraw" parameterType="com.shop.model.Withdraw">
+        <![CDATA[
+        INSERT INTO hy_withdraw (
+            merchants_id
+            , price
+            , status
+            , pay_time
+            , fee_price
+            , created_time
+            , updated_time
+            , withdraw_number
+            , comment
+        )
+        VALUES (
+        	 #{withdraw.merchantsId}
+            , #{withdraw.price}
+            , #{withdraw.status}
+            , #{withdraw.payTime}
+            , #{withdraw.feePrice}
+            , #{withdraw.createdTime}
+            , #{withdraw.updatedTime}
+            , #{withdraw.withdrawNumber}
+            , #{withdraw.comment}
+            , #{withdraw.bizType}
+        )
+        ]]>
+    </insert>
+
+	
+	
+	<select id="getWithdrawById" parameterType="java.lang.Long" resultType="com.shop.model.Withdraw">
+		SELECT 
+		id    			as 	id,
+		merchants_id  	as 	merchantsId,
+		price  			as  price,
+		status     		as  status,
+		pay_time    	as  payTime,
+		fee_price       	as  feePrice,
+		created_time   		as  createdTime,
+		updated_time   		as  updatedTime,
+		withdraw_number   	as  withdrawNumber,
+		comment   			as  comment
+		FROM hy_withdraw
+		
+		WHERE id = #{id}
+		
+	</select>
+	
+	<delete id="delWithdrawById" parameterType="java.lang.Long">
+		DELETE FROM hy_withdraw WHERE id = #{id}
+	</delete>
+</mapper>

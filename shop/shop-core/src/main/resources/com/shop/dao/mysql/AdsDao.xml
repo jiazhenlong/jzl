@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shop.dao.mysql.AdsDao">
+	
+	
+	 <insert id="addAds" parameterType="com.shop.model.Ads" useGeneratedKeys="true" keyProperty="ads.id">
+        <![CDATA[
+        INSERT INTO hy_ads (
+            title
+            , cos_type
+            , url
+            , commission_rate
+            , our_commission_rate
+            , verify
+            , ads_type
+            , comment
+            , shop_id
+            , created_time
+            , updated_time
+        )
+        VALUES (
+        	 #{ads.title}
+            , #{ads.cosType}
+            , #{ads.url}
+            , #{ads.commissionRate}
+            , #{ads.ourCommissionRate}
+            , #{ads.verify}
+            , #{ads.adsType}
+            , #{ads.comment}
+            , #{ads.shopId}
+            , #{ads.createdTime}
+            , #{ads.updatedTime}
+        )
+        ]]>
+    </insert>
+
+	<insert id="addBatchAdsImages" parameterType="com.shop.model.AdsImages">
+        INSERT INTO hy_ads_images (
+        	img_url,
+        	ads_id,
+        	type
+        )
+        VALUES 
+		<foreach collection="adsImagesList" separator=","
+			item="adsImages">
+			(
+            #{adsImages.imgUrl}
+            , #{adsImages.adsId}
+            , #{adsImages.type}
+			)
+		</foreach>
+	</insert>
+	
+	<insert id="addAdsImages" parameterType="com.shop.model.AdsImages">
+        INSERT INTO hy_ads_images (
+        	img_url,
+        	ads_id,
+        	type
+        )
+        VALUES (
+            #{adsImages.imgUrl}
+            , #{adsImages.adsId}
+            , #{adsImages.type}
+		)
+	</insert>
+	
+	<select id="getAdsById" parameterType="java.lang.Long" resultType="com.shop.model.Ads">
+		<include refid="sql_baseColumns"></include>
+		
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findAdsListPage"  resultType="com.shop.model.Ads">
+		<include refid="sql_baseColumns"></include>
+		inner join hy_ads_goods g on g.ads_id = a.id 
+		WHERE shop_id = #{shopId}
+		<if test="verify != null"> and verify = #{verify} </if>
+		<if test="adsName != null"> and title like CONCAT('%',#{adsName}, '%') </if>
+		<if test="sort == 0">order by a.created_time desc </if>
+		<if test="sort == 1">order by commission_rate*goods_price desc </if>
+		<if test="sort == 2">order by commission_rate desc </if>
+		limit #{pageIndex}, #{pageSize}
+	</select>
+	
+	<select id="countAdsPage"  resultType="java.lang.Integer">
+		SELECT count(1) FROM hy_ads a
+		inner join hy_ads_goods g on g.ads_id = a.id 
+		WHERE shop_id = #{shopId}
+		<if test="verify != null"> and verify = #{verify} </if>
+		<if test="adsName != null"> and title like CONCAT('%',#{adsName}, '%') </if>
+	</select>
+	
+	<update id="updateAds" parameterType="com.shop.model.Ads">
+	   update hy_ads set 
+		<if test="ads.title != null">title = #{ads.title}, </if>
+		<if test="ads.cosType != null">cos_type = #{ads.cosType}, </if>
+		<if test="ads.verify != null">verify = #{ads.verify}, </if>
+		<if test="ads.commissionRate != null">commission_rate = #{ads.commissionRate}, </if>
+		<if test="ads.adsType != null">ads_type = #{ads.adsType}, </if>
+		<if test="ads.updatedTime != null">updated_time = #{ads.updatedTime}, </if>
+		
+		version = 1 + #{ads.version}
+	   WHERE id = #{ads.id} and version = #{ads.version}
+	</update>
+	
+	<sql id="sql_baseColumns">
+		SELECT 
+			a.id    			as 	id,
+			a.title  			as 	title,
+			a.cos_type    		as  cosType,
+			a.url       		as  url,
+			a.commission_rate   as  commissionRate,
+			a.our_commission_rate   as  ourCommissionRate,
+			a.verify   			as  verify,
+			a.ads_type			as	adsType,
+			a.comment   		as  comment,
+			a.shop_id   		as  shopId,
+			a.created_time   	as  createdTime,
+			a.updated_time   	as  updatedTime,
+			a.version
+		FROM hy_ads a
+	</sql>
+	
+	<select id="getAdsShopByAdsId" parameterType="java.lang.Long" resultType="com.shop.model.Ads">
+		SELECT 
+			a.id    			as 	id,
+			a.title  			as 	title,
+			a.commission_rate   as  commissionRate,
+			a.our_commission_rate   as  ourCommissionRate,
+			a.verify   			as  verify,
+			a.ads_type			as	adsType,
+			a.comment   		as  comment,
+			a.shop_id   		as  shopId,
+			s.name				as	shopName
+		FROM hy_ads a inner join hy_merchant_shops s on a.shop_id = s.id
+		
+		WHERE a.id = #{adsId}
+	</select>
+	
+	
+	<delete id="delAdsById" parameterType="java.lang.Long">
+		DELETE FROM hy_ads WHERE id = #{id}
+	</delete>
+	
+	
+	<select id="findAdsImagesByAdsId" parameterType="java.lang.Long" resultType="com.shop.model.AdsImages">
+		select
+		id,
+		img_url  as  imgUrl,
+        ads_id	 as  adsId,
+        type
+		from hy_ads_images
+		WHERE ads_id = #{adsId}
+	</select>
+	
+	<select id="findAdsImagesUrlByAdsId" parameterType="java.lang.Long" resultType="java.lang.String">
+		select img_url from hy_ads_images
+		WHERE ads_id = #{adsId}
+	</select>
+	
+	<select id="getAdsImagesById" parameterType="java.lang.Long" resultType="com.shop.model.AdsImages">
+		select
+		id,
+		img_url  as  imgUrl,
+        ads_id	 as  adsId,
+        type
+		from hy_ads_images
+		WHERE id = #{id}
+	</select>
+	
+	
+	<update id="updateAdsImages" parameterType="com.shop.model.AdsImages">
+	   update hy_ads_images set updated_time = now()
+		<if test="adsImages.imgUrl != null">, img_url = #{adsImages.imgUrl}</if>
+		<if test="adsImages.adsId != null">, ads_id = #{adsImages.adsId}</if>
+	   WHERE id = #{id}
+	</update>
+	
+	
+	<delete id="delAdsImagesById" parameterType="java.lang.Long">
+		DELETE FROM hy_ads_images WHERE id = #{id}
+	</delete>
+	
+	<update id="delAdsImagesMapperByAdsId">
+		update hy_ads_images set ads_id = -1, updated_time = now()
+	    where ads_id = #{adsId}
+	</update>
+	
+	<update id="updateAdsImagesByIds">
+		update hy_ads_images set ads_id = #{adsId}, updated_time = now()
+	    where id in
+	    <foreach collection="imgIdList" open="(" close=")" separator="," item="id">
+	    	#{id}
+	    </foreach>
+	</update>
+	
+	<select id="findadsBriefList"  resultType="com.shop.model.AdsBrief">
+		SELECT
+			a.id,
+			a.title,
+			a.commission_rate as commissionRate,
+			img.img_url as imgUrl
+		FROM
+			hy_ads a
+		LEFT JOIN hy_ads_images img ON a.id = img.ads_id
+		<if test="sort == 1"> LEFT JOIN hy_ads_goods g on g.ads_id = a.id </if>
+		where img.type = 1
+		<if test="adsName != null"> and title like CONCAT('%',#{adsName}, '%') </if>
+		<if test="sort == 0">order by a.created_time desc </if>
+		<if test="sort == 1">order by commission_rate*goods_price desc </if>
+		<if test="sort == 2">order by commission_rate desc </if>
+		<if test="sort == 3">order by number desc </if>
+		limit #{pageIndex}, #{pageSize}
+		
+	</select>
+</mapper>

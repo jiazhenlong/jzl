@@ -1,0 +1,60 @@
+
+#指定springcloud 读取zookeeper路径的开始位置
+#spring.cloud.zookeeper.config.root=config/dev
+#开始zk的配置
+#spring.cloud.zookeeper.config.enabled=true
+#zk会在你指定的根目录下寻找以这个项目名命名的目录下的配置
+#spring.application.name=shop-task
+#客户端自动更新zookeeper变更的配置, Bean上添加@RefreshScope注解
+#spring.cloud.zookeeper.config.watcher.enabled=true
+## 配置zookeeper地址
+#spring.cloud.zookeeper.connect-string=192.168.16.170:12181,192.168.16.171:12181,192.168.16.173:12181
+
+# 默认的profile为dev，其他环境通过指定启动参数使用不同的profile，比如：  
+#   测试环境：java -jar shop-task.jar --spring.profiles.active=test  
+#   生产环境：java -jar shop-task.jar --spring.profiles.active=prod 
+spring:  
+  profiles:  
+    active: dev  
+
+---
+spring:
+  profiles: dev
+  application:
+    name: shop-task
+  cloud:
+    zookeeper:
+      connect-string: 192.168.16.170:12181,192.168.16.171:12181,192.168.16.173:12181
+      config:
+        root: config/dev
+        enabled: true
+        watcher:
+          enabled: true
+
+---
+spring:
+  profiles: test
+  application:
+    name: shop-task
+  cloud:
+    zookeeper:
+      connect-string: 192.168.16.34:2181,192.168.16.34:2182,192.168.16.34:2183
+      config:
+        root: config/dev
+        enabled: true
+        watcher:
+          enabled: true
+
+---
+spring:
+  profiles: prod
+  application:
+    name: shop-task
+  cloud:
+    zookeeper:
+      connect-string: 192.168.16.170:12181,192.168.16.171:12181,192.168.16.173:12181
+      config:
+        root: config/dev
+        enabled: true
+        watcher:
+          enabled: true

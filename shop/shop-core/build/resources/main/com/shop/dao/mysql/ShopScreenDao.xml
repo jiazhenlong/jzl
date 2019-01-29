@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shop.dao.mysql.ShopScreenDao">
+	
+	
+	 <insert id="addShopScreen" parameterType="com.shop.model.ShopScreen">
+        <![CDATA[
+        INSERT INTO hy_shop_screen (
+            name
+            , comment
+            , shop_id
+            , created_time
+            , updated_time
+        )
+        VALUES (
+        	 #{shopScreen.name}
+            , #{shopScreen.comment}
+            , #{shopScreen.shopId}
+            , #{shopScreen.createdTime}
+            , #{shopScreen.updatedTime}
+        )
+        ]]>
+    </insert>
+
+	<insert id="addBatchAdsScreen" parameterType="com.shop.model.AdsScreen">
+        INSERT INTO hy_ads_screen (
+        	shop_screen_id,
+        	shop_ads_id
+        )
+        VALUES 
+		<foreach collection="adsScreenList" separator=","
+			item="adsScreen">
+			(
+            #{adsScreen.shopScreenId}
+            , #{adsScreen.shopAdsId}
+			)
+		</foreach>
+	</insert>
+	
+	<select id="getShopScreenById" parameterType="java.lang.Long" resultType="com.shop.model.ShopScreen">
+		SELECT 
+		id    			as 	id,
+		name  			as 	name,
+		comment  		as  comment,
+		shop_id     	as  shopId,
+		created_time    as  createdTime,
+		updated_time   	as  updatedTime
+		FROM hy_shop_screen
+		
+		WHERE id = #{id}
+	</select>
+
+	
+	<delete id="delShopScreenById" parameterType="java.lang.Long">
+		DELETE FROM hy_shop_screen WHERE id = #{id}
+	</delete>
+</mapper>

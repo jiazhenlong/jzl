@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shop.dao.mysql.MerchantsAccountDao">
+	
+	
+	 <insert id="addMerchantsAccount" parameterType="com.shop.model.MerchantsAccount">
+        <![CDATA[
+        INSERT INTO hy_merchants_account (
+            merchants_id
+            , adser_amount
+            , flow_amount
+        )
+        VALUES (
+        	 #{merchantsAccount.merchantsId}
+            , #{merchantsAccount.adserAmount}
+            , #{merchantsAccount.flowAmount}
+        )
+        ]]>
+    </insert>
+
+	
+	
+	<select id="getMerchantsAccountById" resultType="com.shop.model.MerchantsAccount">
+		SELECT 
+		id    			as 	id,
+		merchants_id    as 	merchantsId,
+		adser_amount  	as  adserAmount,
+		flow_amount     as  flowAmount
+		FROM hy_merchants_account
+		
+		WHERE id = #{id}
+		
+	</select>
+
+	
+	<delete id="delMerchantsAccountById" parameterType="java.lang.Long">
+		DELETE FROM hy_merchants_account WHERE id = #{id}
+	</delete>
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shop.dao.mysql.MerchantsAccountLogDao">
+	
+	
+	 <insert id="addMerchantsAccountLog" parameterType="com.shop.model.MerchantsAccountLog">
+        <![CDATA[
+        INSERT INTO hy_merchants_account_log (
+            merchants_id
+            , type
+            , op
+            , amount
+        )
+        VALUES (
+        	 #{merchantsAccountLog.merchantsId}
+            , #{merchantsAccountLog.type}
+            , #{merchantsAccountLog.op}
+            , #{merchantsAccountLog.amount}
+        )
+        ]]>
+    </insert>
+
+	
+	
+	<select id="getMerchantsAccountLogById" parameterType="java.lang.Long" resultType="com.shop.model.MerchantsAccountLog">
+		SELECT 
+		id,
+		merchants_id  	as 	merchantsId,
+		type,
+		op,
+		amount    
+		
+		FROM hy_merchants_account_log
+		
+		WHERE id = #{id}
+	</select>
+
+	
+	<delete id="delMerchantsAccountLogById" parameterType="java.lang.Long">
+		DELETE FROM hy_merchants_account_log WHERE id = #{id}
+	</delete>
+</mapper>

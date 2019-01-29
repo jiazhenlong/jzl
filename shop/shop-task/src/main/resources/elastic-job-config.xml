@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:job="http://www.dangdang.com/schema/ddframe/job"
+	xmlns:reg="http://www.dangdang.com/schema/ddframe/reg" xmlns="http://www.springframework.org/schema/beans"
+	xsi:schemaLocation="
+           http://www.dangdang.com/schema/ddframe/job  http://www.dangdang.com/schema/ddframe/job/job.xsd
+           http://www.dangdang.com/schema/ddframe/reg  http://www.dangdang.com/schema/ddframe/reg/reg.xsd
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       ">
+
+	<!-- 配置作业注册中心; baseSleepTimeMilliseconds:等待重试的间隔时间的初始值单位：毫秒 ;
+		maxSleepTimeMilliseconds:等待重试的间隔时间的最大值单位：毫秒;maxRetries:最大重试次数
+	-->
+	<reg:zookeeper id="regCenter"
+		server-lists="${zookeeper.address}"
+		namespace="elastic-job-shop-task" base-sleep-time-milliseconds="1000" max-sleep-time-milliseconds="3000"
+		max-retries="3" />
+
+	<!-- 配置简单作业 -->
+	<job:simple id="reportJob" class="com.shop.task.job.ReportJob"
+		registry-center-ref="regCenter" cron="0 0/1 * * * ?" sharding-total-count="1" overwrite="true" description="mq监控任务"
+		reconcile-interval-minutes="10" />
+
+</beans>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.shop.dao.mysql.AdsImagesDao">
+	<resultMap id="BaseResultMap" type="com.shop.model.AdsImages">
+		<id column="id" jdbcType="INTEGER" property="id" />
+		<result column="ads_id" jdbcType="INTEGER" property="adsId" />
+		<result column="img_url" jdbcType="VARCHAR" property="imgUrl" />
+		<result column="type" jdbcType="TINYINT" property="type" />
+	</resultMap>
+
+	<sql id="Base_Column_List">
+		id, ads_id, img_url, type
+	</sql>
+
+	<select id="selectByPrimaryKey" parameterType="java.lang.Integer"
+		resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List" />
+		from hy_ads_images
+		where id = #{id,jdbcType=INTEGER}
+	</select>
+
+
+	<insert id="insert" parameterType="com.shop.model.AdsImages"
+		useGeneratedKeys="true" keyProperty="id">
+		insert into
+		hy_ads_images (
+		ads_id,
+		img_url,
+		type,
+		created_time,
+		updated_time)
+		values (
+		#{adsId,jdbcType=INTEGER},
+		#{imgUrl,jdbcType=VARCHAR},
+		#{type,jdbcType=TINYINT},
+		#{createdTime},
+		#{updatedTime})
+	</insert>
+
+
+	<update id="updateByPrimaryKeySelective" parameterType="com.shop.model.AdsImages">
+		update hy_ads_images
+		<set>
+			<if test="adsId != null">
+				ads_id = #{adsId,jdbcType=INTEGER},
+			</if>
+			<if test="imgUrl != null">
+				img_url = #{imgUrl,jdbcType=VARCHAR},
+			</if>
+			<if test="type != null">
+				type = #{type,jdbcType=TINYINT},
+			</if>
+		</set>
+		where id = #{id,jdbcType=INTEGER}
+	</update>
+
+
+</mapper>

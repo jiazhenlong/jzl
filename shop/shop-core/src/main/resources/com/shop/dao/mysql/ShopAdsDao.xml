@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.shop.dao.mysql.ShopAdsDao">
+	
+	
+	 <insert id="addShopAds" parameterType="com.shop.model.ShopAds" useGeneratedKeys="true" keyProperty="shopAds.id">
+        <![CDATA[
+        INSERT INTO hy_shop_ads (
+            shop_id
+            , ads_id
+            , title
+            , verify
+            , status
+            , reason
+            , comment
+            , start_date
+            , end_date
+            , start_time
+            , end_time
+            , action
+            , created_time
+            , updated_time
+        )
+        VALUES (
+        	 #{shopAds.shopId}
+            , #{shopAds.adsId}
+            , #{shopAds.title}
+            , #{shopAds.verify}
+            , #{shopAds.status}
+            , #{shopAds.reason}
+            , #{shopAds.comment}
+            , #{shopAds.startDate}
+            , #{shopAds.endDate}
+            , #{shopAds.startTime}
+            , #{shopAds.endTime}
+            , #{shopAds.action}
+            , #{shopAds.createdTime}
+            , #{shopAds.updatedTime}
+        )
+        ]]>
+    </insert>
+    
+    <insert id="addBatchShopAds" parameterType="com.shop.model.ShopAds">
+        INSERT INTO hy_shop_ads (
+            shop_id
+            , ads_id
+            , title
+            , verify
+            , status
+            , reason
+            , comment
+            , start_date
+            , end_date
+            , start_time
+            , end_time
+            , action
+            , created_time
+            , updated_time
+        )
+        VALUES 
+        <foreach collection="shopAdsList" separator=","
+			item="shopAds">
+			(
+        	 #{shopAds.shopId}
+            , #{shopAds.adsId}
+            , #{shopAds.title}
+            , #{shopAds.verify}
+            , #{shopAds.status}
+            , #{shopAds.reason}
+            , #{shopAds.comment}
+            , #{shopAds.startDate}
+            , #{shopAds.endDate}
+            , #{shopAds.startTime}
+            , #{shopAds.endTime}
+            , #{shopAds.action}
+            , #{shopAds.createdTime}
+            , #{shopAds.updatedTime}
+        )
+        </foreach>
+    </insert>
+	
+	<select id="getShopAdsById" parameterType="java.lang.Long" resultType="com.shop.model.ShopAds">
+        <include refid="baseSql"></include>
+		
+		WHERE sa.id = #{id}
+	</select>
+
+
+	<select id="getShopAdsDetailById" parameterType="java.lang.Long" resultType="com.shop.model.ShopAds">
+        SELECT 
+		sa.id    			as 	id,
+		sa.shop_id  		as 	shopId,
+		sa.ads_id  			as  adsId,
+		sa.title ,
+		sa.verify     		as  verify,
+		sa.status    		as  status,
+		sa.reason   		as  reason,
+		sa.comment    		as  comment,
+		sa.start_date		as	startDate,
+		sa.end_date			as	endDate,
+		sa.start_time		as	startTime,
+		sa.end_time			as	endTime,
+		sa.action ,
+		ms.name             as	shopName
+		FROM hy_shop_ads sa
+		left join hy_merchant_shops ms on sa.shop_id = ms.id
+		WHERE sa.id = #{id}
+	</select>
+	
+	<sql id="baseSql">
+	  SELECT 
+		sa.id    			as 	id,
+		sa.shop_id  		as 	shopId,
+		sa.ads_id  			as  adsId,
+		sa.title ,
+		sa.verify     		as  verify,
+		sa.status    		as  status,
+		sa.reason   		as  reason,
+		sa.comment    		as  comment,
+		sa.start_date		as	startDate,
+		sa.end_date			as	endDate,
+		sa.start_time		as	startTime,
+		sa.end_time			as	endTime,
+		sa.action ,
+		sa.created_time     as  createdTime,
+		sa.updated_time   	as  updatedTime
+		FROM hy_shop_ads sa
+	
+	</sql>
+	
+	<select id="findShopAdsListPage"  resultType="com.shop.model.ShopAds">
+        <include refid="baseSql"></include>
+		
+		WHERE sa.ads_id in (select id from hy_ads a where a.verify = 1 and a.shop_id = #{adsShopId})
+		<if test="verify != null"> and sa.verify = #{verify} </if>
+		<if test="status != null"> and sa.status = #{status} </if>
+		<if test="title != null"> and sa.title like CONCAT('%',#{title}, '%') </if>
+		
+		limit #{pageIndex}, #{pageSize}
+	</select>
+	
+	<select id="findShopAdsList"  resultType="com.shop.model.ShopAds">
+        <include refid="baseSql"></include>
+		
+		WHERE 1=1
+		<if test="verify != null"> and sa.verify = #{verify} </if>
+		<if test="status != null"> and sa.status = #{status} </if>
+		<if test="title != null"> and sa.title like CONCAT('%',#{title}, '%') </if>
+	</select>
+	
+	<select id="countShopAdsPage"  resultType="java.lang.Integer">
+        SELECT count(1) FROM hy_shop_ads sa
+		
+		WHERE sa.ads_id in (select id from hy_ads a where a.verify = 1 and a.shop_id = #{adsShopId})
+		<if test="verify != null"> and sa.verify = #{verify} </if>
+		<if test="status != null"> and sa.status = #{status} </if>
+		<if test="title != null"> and sa.title like CONCAT('%',#{title}, '%') </if>
+	</select>
+	
+	<delete id="delShopAdsById" parameterType="java.lang.Long">
+		DELETE FROM hy_shop_ads WHERE id = #{id}
+	</delete>
+</mapper>
